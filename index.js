@@ -63,11 +63,20 @@ app.get('/gallery', function(req, res){
         content_type : 1,
         text : 'slack'
         }, function(err, result) {
+            console.log('TOtal Photos' + result.photos.total);
+            var context = {
+                //page":1,"pages":7685,"perpage":10,"total":"76844",
+                page : result.photos.page,
+                pages : result.photos.pages,
+                perpage : result.photos.perpage,
+                total : result.photos.total,
+                photos : result.photos.photo
+            };
             var jsonResult = JSON.stringify(result);
             console.log(jsonResult);
+            res.render('gallery', context);
         });
     });
-    res.render('gallery');
 });
 
 // cb
