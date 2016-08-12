@@ -51,6 +51,25 @@ app.get('/', function(req, res) {
 
 });
 
+// gallery
+app.get('/gallery', function(req, res){
+    Flickr.tokenOnly(flickrOptions, function(error, flickr) {
+  // we can now use "flickr" as our API object,
+  // but we can only call public methods and access public data
+      flickr.photos.search({
+        page: 1,
+        per_page: 10,
+        safe_search : 1,
+        content_type : 1,
+        text : 'slack'
+        }, function(err, result) {
+            var jsonResult = JSON.stringify(result);
+            console.log(jsonResult);
+        });
+    });
+    res.render('gallery');
+});
+
 // cb
 app.get('/cb', function(req, res) {
     console.log("cb rtequest " + req.query.oauth_token);
