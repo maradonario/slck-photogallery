@@ -14,7 +14,9 @@ module.exports = {
 4. run the command to install the required modules:
 `npm install`
 
-5. run the web server locally by calling `index.js` from the root folder of the app:
+5. run the web server locally by calling `server.js` from the root folder of the app:
 `node server`
 
 6. Using a browser go to `http://localhost:3000/gallery`
+
+## Please be mindful of the search terms since FLickr API's safe search may not bring back appropiate results
