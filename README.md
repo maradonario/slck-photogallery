@@ -12,7 +12,7 @@ module.exports = {
 };
 ```
 4. run the command to install the required modules:
-`npm install'
+`npm install`
 
 5. run the web server locally by calling `index.js` from the root folder of the app:
 `node index.js`
