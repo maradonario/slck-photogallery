@@ -8,7 +8,8 @@ var Flickr = require("flickrapi"),
     flickrOptions = {
       api_key: credentials.flickr.key,
       secret: credentials.flickr.secret,
-      callback : "http://localhost:3000/cb"
+      callback : "http://localhost:3000/cb",
+      progress: false
     };
 
 // set up handle bars
