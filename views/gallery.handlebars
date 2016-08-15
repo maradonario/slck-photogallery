@@ -19,11 +19,15 @@
         <li class="active"><a href="#">Gallery <span class="sr-only"></span></a></li>
         <li><a href="#">Caveman Gallery</a></li>
       </ul>
-      <form class="navbar-form navbar-left">
+      <form id="searchTermForm" class="navbar-form navbar-left searchTerm" method="POST" action="/gallery" >
         <div class="form-group">
-          <input type="text" class="form-control" placeholder="Search">
+          <input id="searchTerm" type="text" class="form-control" placeholder="Search" name="searchTerm">
         </div>
         <button type="submit" class="btn btn-default">Submit</button>
+        <input id="page" type="hidden" value="{{page}}"" name="page">
+        <input id="currentSearchTerm" type="hidden" value="{{currentSearchTerm}}" name="currentSearchTerm">
+        <input id="totalPages" type="hidden" value="{{pages}}" name="pages">
+        
       </form>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="#">Authenticate</a></li>
@@ -33,19 +37,73 @@
 </nav>
 
 
-<div class="row">
+<div id="resultPhotos" class="row resultPhotos">
   {{#each photos}}
   <div class="col-xs-6 col-md-3">
-    <a href="https://farm{{farm}}.staticflickr.com/{{server}}/{{id}}_{{secret}}.jpg" class="thumbnail">
-      <img class="img-circle img-responsive" alt="{{title}}" src="https://farm{{farm}}.staticflickr.com/{{server}}/{{id}}_{{secret}}.jpg">
-    </a>
+    <button onclick="document.getElementById('lightbox-{{@index}}').style.display='inline';" class="thumbnail">
+      <img alt="{{title}}" src="https://farm{{farm}}.staticflickr.com/{{server}}/{{id}}_{{secret}}.jpg">
+    </button>
   </div>
+  <div id="lightbox-{{@index}}" class="lightbox-cust" style="display:none"
+        onclick="document.getElementById('lightbox-{{@index}}').style.display='none';">
+    <table class="lightbox_table">
+      <tr>
+        <td class="lightbox_table_cell" align="center">
+            <div id="lightbox_content" style="width:300px;">
+              <img alt="{{title}}" src="https://farm{{farm}}.staticflickr.com/{{server}}/{{id}}_{{secret}}.jpg">
+              <span class="label label-info" style="width:300px;">{{title}}</span>             
+              <div class="btn-group center-block" role="group" aria-label="...">
+                {{#if @index}}
+                  <button type="button" class="btn btn-default" aria-label="Left Align" onclick="document.getElementById('lightbox-{{dec @index}}').style.display='inline';">
+                    <span class="glyphicon glyphicon-step-backward" aria-hidden="true" ></span>
+                  </button> 
+                {{/if}}
+                {{#ifNotLast @index}}
+                  <button type="button" class="btn btn-default" aria-label="Right Align" onclick="document.getElementById('lightbox-{{inc @index}}').style.display='inline';">
+                    <span class="glyphicon glyphicon-step-forward" aria-hidden="true" ></span>
+                  </button>
+                {{/ifNotLast}}
+              </div>            
+            </div>
+        </td>
+      </tr>
+    </table>
+  </div>  
   {{/each}}
 </div>
 
-
 <div class="btn-group center-block" role="group" aria-label="...">
-  <button type="button" class="btn btn-default">Previous</button>
+  <button type="button" class="btn btn-default" onclick="prevPage()">Previous</button>
   <button type="button" class="btn btn-default">Page {{page}} of {{pages}}</button>
-  <button type="button" class="btn btn-default">Next</button>
+  <button type="button" class="btn btn-default" onclick="nextPage()">Next</button>
 </div>
+
+<script>
+  function nextPage() {
+    var searchTerm = document.getElementById("currentSearchTerm").value;
+    var totalPages = document.getElementById("totalPages").value;
+    var currentPage = document.getElementById("page").value;
+
+    if (currentPage == totalPages)
+    {
+      return;
+    }
+    var page = Number(currentPage) + 1;
+
+    window.location.href = "/gallery?page=" + page + "&currentSearchTerm=" + searchTerm;
+  }
+
+  function prevPage() {
+    var searchTerm = document.getElementById("currentSearchTerm").value;
+    var totalPages = document.getElementById("totalPages").value;
+    var currentPage = document.getElementById("page").value;
+    
+    if (currentPage == 1) {
+      return;
+    }
+    page = Number(currentPage) - 1;
+    window.location.href = "/gallery?page=" + page + "&currentSearchTerm=" + searchTerm;
+   
+  }
+
+</script>
