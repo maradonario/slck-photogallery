@@ -2,6 +2,8 @@ var express = require('express');
 var app = express();
 var credentials = require('./credentials.js');
 var PAGESIZE = 12;
+var DEFAULTSEARCH = "SF GIANTS";
+
 var Flickr = require("flickrapi"),
     flickrOptions = {
       api_key: credentials.flickr.key,
@@ -28,15 +30,34 @@ var handlebars = require('express-handlebars').create({
         },
         ifNotLast : function(value, options) {
             if (Number(value) === PAGESIZE - 1)  {
-                console.log('last one: ' + value);
                 return options.inverse(this);
             }
-            console.log('not last ' + value);
             return options.fn(this);
         }
     }
 });
 
+function callFlickr(page, searchTerm, res) {
+    Flickr.tokenOnly(flickrOptions, function(error, flickr) {
+      flickr.photos.search({
+        page: page,
+        per_page: PAGESIZE,
+        safe_search : 1,
+        content_type : 1,
+        text : searchTerm
+        }, function(err, result) {
+            var context = {
+                page : result.photos.page,
+                pages : result.photos.pages,
+                perpage : result.photos.perpage,
+                total : result.photos.total,
+                photos : result.photos.photo,
+                currentSearchTerm : searchTerm
+            };
+            res.render('gallery', context);
+        });
+    });
+};
 
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
@@ -49,104 +70,32 @@ app.use(express.static(__dirname + '/public'));
 
 // body-parser
 app.use(require('body-parser').urlencoded({extended : true}));
+
 // home page
 app.get('/', function(req, res) {
-  
     res.render('home');
-
-});
-
-app.post('/submitJS', function(req, res) {
-    console.log(req.body.searchTerm);
-    res.render('ajax', { layout : null});
 });
 
 // gallery
 app.get('/gallery', function(req, res){
-    
     var searchTerm = '';
     var page = '';
     if (req.query.currentSearchTerm == null) {
-        console.log("No search term");
-        searchTerm = 'mario';
+        searchTerm = DEFAULTSEARCH;
         page = 1;
     }
     else {
         searchTerm = req.query.currentSearchTerm;
         page = req.query.page;
     }
-
-    console.log(page);
-    console.log(searchTerm);
-    Flickr.tokenOnly(flickrOptions, function(error, flickr) {
-  // we can now use "flickr" as our API object,
-  // but we can only call public methods and access public data
-      flickr.photos.search({
-        page: page,
-        per_page: PAGESIZE,
-        safe_search : 1,
-        content_type : 1,
-        text : searchTerm,
-        }, function(err, result) {
-            console.log(err);
-            console.log('TOtal Photos' + result.photos.total);
-            var context = {
-                //page":1,"pages":7685,"perpage":10,"total":"76844",
-                page : result.photos.page,
-                pages : result.photos.pages,
-                perpage : result.photos.perpage,
-                total : result.photos.total,
-                photos : result.photos.photo,
-                currentSearchTerm : searchTerm,
-            };
-            var jsonResult = JSON.stringify(result);
-            console.log(jsonResult);
-            res.render('gallery', context);
-        });
-    });
+    callFlickr(page, searchTerm, res);
 });
 
 // gallery
 app.post('/gallery', function(req, res){
     var searchTerm = req.body.searchTerm;
-    var page = req.body.page;
-    Flickr.tokenOnly(flickrOptions, function(error, flickr) {
-  // we can now use "flickr" as our API object,
-  // but we can only call public methods and access public data
-      flickr.photos.search({
-        page: 1,
-        per_page: PAGESIZE,
-        safe_search : 1,
-        content_type : 1,
-        text : searchTerm
-        }, function(err, result) {
-            console.log('TOtal Photos' + result.photos.total);
-            var context = {
-                //page":1,"pages":7685,"perpage":10,"total":"76844",
-                page : result.photos.page,
-                pages : result.photos.pages,
-                perpage : result.photos.perpage,
-                total : result.photos.total,
-                photos : result.photos.photo,
-                currentSearchTerm : searchTerm
-            };
-            var jsonResult = JSON.stringify(result);
-            console.log(jsonResult);
-            res.render('gallery', context);
-        });
-    });
-});
-
-app.post('/iterate', function(req, res){
-    var searchText = req.searchTerm;
-});
-
-// cb
-app.get('/cb', function(req, res) {
-    console.log("cb rtequest " + req.query.oauth_token);
-  res.write("");
-  flickrOptions.exchange(req.query);
-
+    var page = 1;
+    callFlickr(page, searchTerm, res);
 });
 
 // static content

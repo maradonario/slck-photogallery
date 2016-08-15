@@ -10,14 +10,13 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">Home</a>
+      <a class="navbar-brand" href="/">Home</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Gallery <span class="sr-only"></span></a></li>
-        <li><a href="#">Caveman Gallery</a></li>
+        <li class="active"><a href="/gallery">Gallery <span class="sr-only"></span></a></li>
       </ul>
       <form id="searchTermForm" class="navbar-form navbar-left searchTerm" method="POST" action="/gallery" >
         <div class="form-group">
@@ -29,9 +28,6 @@
         <input id="totalPages" type="hidden" value="{{pages}}" name="pages">
         
       </form>
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="#">Authenticate</a></li>
-      </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
